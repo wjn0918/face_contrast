@@ -1,6 +1,6 @@
 
 from DBUtils.PooledDB import PooledDB
-from settings import * 
+from faceContrast.settings import * 
 import pymysql
 
    
@@ -26,10 +26,10 @@ class DBClient(object):
         cursor = con.cursor()
         sql = 'select * from t_face_recognition'
         cursor.execute(sql)
-        r = cursor.fetchall()
-        print(r)
+        datas = cursor.fetchall()
         cursor.close()
         con.close()
+        return datas
 
 
 if __name__ == '__main__':
