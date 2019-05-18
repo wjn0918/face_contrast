@@ -1,14 +1,15 @@
 from multiprocessing import Process
-from faceContrast.db import DBClient
+from faceContrast.db import MysqlClient, MongoDBClient
 import numpy as np
 import face_recognition
 import os
+from faceContrast.settings import * 
 
 def getData():
     indexAndPath = {}
     indexs = []
     paths = []
-    con = DBClient()
+    con = MysqlClient()
     datas = con.get()
     for data in datas:
         indexs.append(data[0])
@@ -19,27 +20,46 @@ def getData():
     return indexAndPath
 
 
-def face_2_matrix(file_paths):
+def save2mongo(obj: dict):
+    """
+    特征数据存储到mongodb
+    """
+    con = MongoDBClient()
+    con.set(obj)
+
+
+
+    pass
+
+def save2local(path:str, obj: dict):
+    if os.path.exists(path):
+        print("该文件已存在")
+    else:
+        np.savetxt(path, obj['facedata'])
+
+
+def face_2_matrix(datas: dict):
     """
     将图片转化为矩阵类型，并提取人脸特征值，存储成*.out类型文件
     """
-    num = 0
-    for filePath in file_paths:
+    for index, filePath in enumerate(datas['path']):
+        id_facedata = {}
         path = filePath.split('.')[0]+".out"
-        print(filePath)
-        print(path)
-        # try:
-        obj = face_recognition.face_encodings(face_recognition.load_image_file(filePath))[0]
-        print('ok')
-        # except:
-        #     continue
-        if os.path.exists(path):
-            print("该文件已存在")
+        id_facedata['id'] = datas['index'][index]
+        try:
+            obj = face_recognition.face_encodings(face_recognition.load_image_file(filePath))[0]
+            id_facedata['facedata'] = obj
+        except:
+            print("特征提取出错")
             continue
-        else:
-            np.savetxt(path, obj)
-        print(num)
-        num += 1
+
+        if DATA_SAVE_LOCATION == 1:
+            save2mongo(id_facedata)
+        if DATA_SAVE_LOCATION == 0:
+            save2local(path, id_facedata)
+
+
+        
     pass
 
 class Schedule(object):
@@ -50,14 +70,28 @@ class Schedule(object):
         图像转换为矩阵类型
         """
         r = getData()
-        face_2_matrix(r['path'])
+        face_2_matrix(r)
 
         print(r)
+  
+    @staticmethod
+    def getfacedatas():
+        """
+        获取mongodb中的人像特征数据
+        """
+        con = MongoDBClient()
+        id_facedata = con.get()
+        print(id_facedata)
+
+        
         
 
     def run(self):
         print('photo2vector processing running')
         photo2vector_process = Process(target=Schedule.photo2Vector)
-        # check_process = Process(target=Schedule.check_pool)
         photo2vector_process.start()
-        # check_process.start()
+
+        print('getfacedatas processing running')
+        getfacedatas = Process(target=Schedule.getfacedatas)
+        getfacedatas.start()
+
