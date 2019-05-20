@@ -1,16 +1,35 @@
 from multiprocessing import Process
-from faceContrast.db import MysqlClient, MongoDBClient
+from faceContrast.db import MysqlClient, MongoDBClient, DMClient
 import numpy as np
 import face_recognition
 import os
 from faceContrast.settings import * 
 from apscheduler.schedulers.background import BackgroundScheduler
+import logging
+
+
+if os.path.exists('log'):
+    pass   
+else:
+    os.mkdir('log')
+
+
+logging.basicConfig(level=logging.DEBUG,#控制台打印的日志级别
+                filename='log/run.log',
+                filemode='a',##模式，w写模式，a是追加模式，默认如果不写的话，就是追加模式
+                format='%(asctime)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s', #日志格式
+                )
+
+
 
 def getData(flag:int):
     indexAndPath = {}
     indexs = []
     paths = []
-    con = MysqlClient()
+    if DB_FLAG:
+        con = MysqlClient()
+    else:
+        con = DMClient()
     datas = con.get(flag)
     for data in datas:
         indexs.append(data[0])
@@ -50,10 +69,14 @@ def face_2_matrix(datas: dict):
         try:
             obj = face_recognition.face_encodings(face_recognition.load_image_file(filePath))[0]
             id_facedata['facedata'] = obj
-        except:
-            print("特征提取出错")
+        except FileNotFoundError:
+            print("No such file or directory: %s" %(filePath))
+            logging.error("id_number:%s, No such file or directory: %s " %(datas['index'][index], filePath))
             continue
-
+        except IndexError:
+            print("don't have face in this photo")
+            logging.error("id_number:%s, don't have face in this photo: %s " %(datas['index'][index], filePath))
+            continue
         if DATA_SAVE_LOCATION == 1:
             save2mongo(id_facedata)
         if DATA_SAVE_LOCATION == 0:
@@ -111,7 +134,7 @@ class Schedule(object):
         # 增量数据定时执行
         scheduler = BackgroundScheduler()
         # 间隔3秒钟执行一次
-        scheduler.add_job(Schedule.photo2Vector_add, 'interval', seconds=10)
+        scheduler.add_job(Schedule.photo2Vector_add, 'interval', seconds=100000)
         # 定时任务12:00执行
         # scheduler.add_job(Schedule.photo2Vector, 'cron', hour=24, minute=0)
         # 这里的调度任务是独立的一个线程

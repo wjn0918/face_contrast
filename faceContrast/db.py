@@ -6,6 +6,8 @@ from pymongo import MongoClient
 from bson.binary import Binary
 import datetime
 import pickle
+# import dmPython
+import logging
 
    
 class MongoDBClient(object):
@@ -58,6 +60,7 @@ class MysqlClient(object):
             sql = 'select * from t_face_recognition'
             args = None
             print("获取全量数据")
+            logging.info("initial, encoding all data")
         else:
             sql = 'select * from t_face_recognition where DATE(flag) = %s'
             args = today
@@ -67,6 +70,41 @@ class MysqlClient(object):
         cursor.close()
         con.close()
         return datas
+
+
+
+
+class DMClient(object):
+
+    def __init__(self):
+        self.conn = dmPython.connect(host=DM_HOST,port=DM_PORT,user=DM_USER_NAME,password=DM_PASSWORD)
+
+    def get(self,flag: int):
+        """
+        获取数据
+        @param flag:判断数据获取方式 1 全量数据， 0 增量数据
+        """
+        today =datetime.datetime.now().date()
+
+        
+        cursor = self.conn.cursor()
+        if flag:
+            sql = 'select * from "SYSDBA"."T_CS_FACE_RECOGNITION"'
+            # args = None
+            print("获取全量数据")
+            logging.info("initial, encoding all data")
+        else:
+            sql = 'select * from "SYSDBA"."T_CS_FACE_RECOGNITION" where to_date(update_time) = \'%s\'' %(today)
+            # args = today
+            print("获取增量数据")
+        cursor.execute(sql)
+        datas = cursor.fetchall()
+        cursor.close()
+        self.conn.close()
+        return datas
+
+
+
 
 
 if __name__ == '__main__':

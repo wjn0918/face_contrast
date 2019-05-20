@@ -1,3 +1,12 @@
-DBUtils
-===
 .数据库连接工具
+DBUtils
+.连接MySQL包
+pymysql
+.连接mongodb包
+pymongo
+.调度器依赖包
+tzlocal
+pytz
+six
+.调度器
+APScheduler

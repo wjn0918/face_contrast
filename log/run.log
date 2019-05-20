@@ -1,0 +1,21 @@
+2019-05-20 16:00:19,203 - D:\soft\python\python\python\lib\site-packages\apscheduler\schedulers\base.py[line:440] - INFO: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2019-05-20 16:00:19,204 - D:\soft\python\python\python\lib\site-packages\apscheduler\schedulers\base.py[line:881] - INFO: Added job "Schedule.photo2Vector_add" to job store "default"
+2019-05-20 16:00:19,204 - D:\soft\python\python\python\lib\site-packages\apscheduler\schedulers\base.py[line:166] - INFO: Scheduler started
+2019-05-20 16:00:19,204 - D:\soft\python\python\python\lib\site-packages\apscheduler\schedulers\base.py[line:940] - DEBUG: Looking for jobs to run
+2019-05-20 16:00:19,205 - D:\soft\python\python\python\lib\site-packages\apscheduler\schedulers\base.py[line:1020] - DEBUG: Next wakeup is due at 2019-05-20 16:00:29.203908+08:00 (in 9.999003 seconds)
+2019-05-20 16:00:19,214 - D:\soft\python\python\python\lib\site-packages\werkzeug\_internal.py[line:88] - INFO:  * Running on http://127.0.0.1:5001/ (Press CTRL+C to quit)
+2019-05-20 16:00:21,333 - d:\wk\face_recognition_adit\face_contrast\faceContrast\schedule.py[line:72] - ERROR: id_number:1, 特征提取出错
+2019-05-20 16:00:21,333 - d:\wk\face_recognition_adit\face_contrast\faceContrast\schedule.py[line:72] - ERROR: id_number:1, 特征提取出错
+2019-05-20 16:00:21,333 - d:\wk\face_recognition_adit\face_contrast\faceContrast\schedule.py[line:72] - ERROR: id_number:1, 特征提取出错
+2019-05-20 16:00:29,206 - D:\soft\python\python\python\lib\site-packages\apscheduler\schedulers\base.py[line:940] - DEBUG: Looking for jobs to run
+2019-05-20 16:00:29,207 - D:\soft\python\python\python\lib\site-packages\apscheduler\executors\base.py[line:123] - INFO: Running job "Schedule.photo2Vector_add (trigger: interval[0:00:10], next run at: 2019-05-20 16:00:29 CST)" (scheduled at 2019-05-20 16:00:29.203908+08:00)
+2019-05-20 16:00:29,207 - D:\soft\python\python\python\lib\site-packages\apscheduler\schedulers\base.py[line:1020] - DEBUG: Next wakeup is due at 2019-05-20 16:00:39.203908+08:00 (in 9.997681 seconds)
+2019-05-20 16:00:30,334 - D:\soft\python\python\python\lib\site-packages\apscheduler\executors\base.py[line:144] - INFO: Job "Schedule.photo2Vector_add (trigger: interval[0:00:10], next run at: 2019-05-20 16:00:39 CST)" executed successfully
+2019-05-20 16:00:39,205 - D:\soft\python\python\python\lib\site-packages\apscheduler\schedulers\base.py[line:940] - DEBUG: Looking for jobs to run
+2019-05-20 16:00:39,205 - D:\soft\python\python\python\lib\site-packages\apscheduler\executors\base.py[line:123] - INFO: Running job "Schedule.photo2Vector_add (trigger: interval[0:00:10], next run at: 2019-05-20 16:00:39 CST)" (scheduled at 2019-05-20 16:00:39.203908+08:00)
+2019-05-20 16:00:39,206 - D:\soft\python\python\python\lib\site-packages\apscheduler\schedulers\base.py[line:1020] - DEBUG: Next wakeup is due at 2019-05-20 16:00:49.203908+08:00 (in 9.998451 seconds)
+2019-05-20 16:00:40,330 - D:\soft\python\python\python\lib\site-packages\apscheduler\executors\base.py[line:144] - INFO: Job "Schedule.photo2Vector_add (trigger: interval[0:00:10], next run at: 2019-05-20 16:00:49 CST)" executed successfully
+2019-05-20 16:00:49,205 - D:\soft\python\python\python\lib\site-packages\apscheduler\schedulers\base.py[line:940] - DEBUG: Looking for jobs to run
+2019-05-20 16:00:49,205 - D:\soft\python\python\python\lib\site-packages\apscheduler\executors\base.py[line:123] - INFO: Running job "Schedule.photo2Vector_add (trigger: interval[0:00:10], next run at: 2019-05-20 16:00:49 CST)" (scheduled at 2019-05-20 16:00:49.203908+08:00)
+2019-05-20 16:00:49,206 - D:\soft\python\python\python\lib\site-packages\apscheduler\schedulers\base.py[line:1020] - DEBUG: Next wakeup is due at 2019-05-20 16:00:59.203908+08:00 (in 9.998219 seconds)
+2019-05-20 16:00:52,637 - D:\soft\python\python\python\lib\site-packages\apscheduler\executors\base.py[line:144] - INFO: Job "Schedule.photo2Vector_add (trigger: interval[0:00:10], next run at: 2019-05-20 16:00:59 CST)" executed successfully

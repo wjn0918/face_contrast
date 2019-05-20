@@ -21,7 +21,7 @@ def getfacedatas():
     """
     con = MongoDBClient()
     id_facedata = con.get()
-    print(id_facedata)
+    # print(id_facedata)
     return id_facedata
 
 
@@ -58,7 +58,7 @@ class Contrast():
             idnumber_distances.append({'distance': distance,'id': ids[index]})
         sorted_results = sorted(idnumber_distances, key=lambda k: k['distance'])
         return sorted_results
-        print(sorted_results)
+        # print(sorted_results)
         
 
 
@@ -78,7 +78,8 @@ class Contrast():
             if isinstance(flag, numpy.ndarray):
                 print("图片中存在人脸")
                 r = self.__detect_faces_in_image(flag)
-                return 'ok'
+                print(r)
+                return r
             else:
                 print("图片中没有人脸")
                 return redirect(request.url)
