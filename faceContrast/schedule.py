@@ -4,6 +4,7 @@ import numpy as np
 import face_recognition
 import os
 from faceContrast.settings import * 
+from apscheduler.schedulers.background import BackgroundScheduler
 
 def getData():
     indexAndPath = {}
@@ -87,11 +88,31 @@ class Schedule(object):
         
 
     def run(self):
+        """
+
+        """
+        # scheduler = BackgroundScheduler()
+        # # 间隔3秒钟执行一次
+        # # scheduler.add_job(init, 'interval', seconds=3)
+        # # 定时任务12:00执行
+        # scheduler.add_job(Schedule.photo2Vector, 'cron', hour=24, minute=0)
+        # # 这里的调度任务是独立的一个线程
+        # scheduler.start()
+        # # print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
+
         print('photo2vector processing running')
         photo2vector_process = Process(target=Schedule.photo2Vector)
         photo2vector_process.start()
 
-        print('getfacedatas processing running')
-        getfacedatas = Process(target=Schedule.getfacedatas)
-        getfacedatas.start()
+        # print('getfacedatas processing running')
+        # getfacedatas = Process(target=Schedule.getfacedatas)
+        # getfacedatas.start()
+
+
+
+
+    
+
+        
+
 

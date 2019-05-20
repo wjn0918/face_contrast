@@ -3,9 +3,9 @@ from faceContrast.schedule import Schedule
 
 def main():
 
-    s = Schedule()
-    s.run()
-    # app.run(host='',port=5001)
+    # s = Schedule()
+    # s.run()
+    app.run(host='',port=5001)
 
 
 

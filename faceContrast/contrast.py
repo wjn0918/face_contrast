@@ -5,6 +5,9 @@
 from flask import Flask,jsonify, request, redirect, render_template
 from faceContrast.settings import * 
 import face_recognition
+from faceContrast.db import MysqlClient, MongoDBClient
+import numpy
+
 
 
 def allowed_file(filename):
@@ -12,9 +15,21 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+def getfacedatas():
+    """
+    获取mongodb中的人像特征数据
+    """
+    con = MongoDBClient()
+    id_facedata = con.get()
+    print(id_facedata)
+    return id_facedata
+
 
 class Contrast():
+
     def __init__(self):
+        self.id_facedata = getfacedatas()
+
         pass
 
     def if_contain_face(self, file_stream):
@@ -35,8 +50,16 @@ class Contrast():
 
 
     def __detect_faces_in_image(self, unknown_face_encoding):
-
+        idnumber_distances = []
+        known_face_encodings = self.id_facedata['facedata']
+        ids = self.id_facedata['id']
         face_distances = face_recognition.face_distance(known_face_encodings, unknown_face_encoding)
+        for index, distance in enumerate(face_distances):
+            idnumber_distances.append({'distance': distance,'id': ids[index]})
+        sorted_results = sorted(idnumber_distances, key=lambda k: k['distance'])
+        return sorted_results
+        print(sorted_results)
+        
 
 
 
@@ -52,11 +75,10 @@ class Contrast():
 
         if file and allowed_file(file.filename):
             flag = self.if_contain_face(file)
-            if flag:
+            if isinstance(flag, numpy.ndarray):
                 print("图片中存在人脸")
-                self.__detect_faces_in_image(flag)
-
-                # return redirect(request.url)
+                r = self.__detect_faces_in_image(flag)
+                return 'ok'
             else:
                 print("图片中没有人脸")
                 return redirect(request.url)

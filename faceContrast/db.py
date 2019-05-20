@@ -25,7 +25,7 @@ class MongoDBClient(object):
 
     def get(self) -> dict:
         """
-        获取mongodb中的数据并以
+        获取mongodb中的数据并以字典形式返回
         """
         collection = self.db.faces_set
         datas = collection.find()

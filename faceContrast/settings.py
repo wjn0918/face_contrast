@@ -10,9 +10,7 @@ MYSQL_USER_NAME = 'root'
 MYSQL_PASSWORD = 123456
 MYSQL_DB_NAME = 'dm'
 
-# mongodb配置
-MONGODB_HOST = 'localhost'
-MONGODB_PORT = 27017
+
 
 
 
@@ -20,5 +18,9 @@ MONGODB_PORT = 27017
 
 # 特征数据存储位置【1：mongodb,0:本地】
 DATA_SAVE_LOCATION = 1
+
+# mongodb配置
+MONGODB_HOST = '192.168.2.221'
+MONGODB_PORT = 27017
 
 
