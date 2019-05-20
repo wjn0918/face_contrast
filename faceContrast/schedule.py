@@ -6,12 +6,12 @@ import os
 from faceContrast.settings import * 
 from apscheduler.schedulers.background import BackgroundScheduler
 
-def getData():
+def getData(flag:int):
     indexAndPath = {}
     indexs = []
     paths = []
     con = MysqlClient()
-    datas = con.get()
+    datas = con.get(flag)
     for data in datas:
         indexs.append(data[0])
         paths.append(data[1])
@@ -66,14 +66,27 @@ def face_2_matrix(datas: dict):
 class Schedule(object):
 
     @staticmethod
-    def photo2Vector():
+    def photo2Vector_all():
         """
         图像转换为矩阵类型
+        全量数据更新
         """
-        r = getData()
+        r = getData(1)
         face_2_matrix(r)
-
         print(r)
+
+
+    @staticmethod
+    def photo2Vector_add():
+        """
+        图像转换为矩阵类型
+        增量数据更新
+        """
+        r = getData(0)
+        face_2_matrix(r)
+        print(r)
+
+    
   
     @staticmethod
     def getfacedatas():
@@ -91,18 +104,23 @@ class Schedule(object):
         """
 
         """
-        # scheduler = BackgroundScheduler()
-        # # 间隔3秒钟执行一次
-        # # scheduler.add_job(init, 'interval', seconds=3)
-        # # 定时任务12:00执行
-        # scheduler.add_job(Schedule.photo2Vector, 'cron', hour=24, minute=0)
-        # # 这里的调度任务是独立的一个线程
-        # scheduler.start()
-        # # print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
-
-        print('photo2vector processing running')
-        photo2vector_process = Process(target=Schedule.photo2Vector)
+        # 全量数据转换
+        photo2vector_process = Process(target=Schedule.photo2Vector_all)
         photo2vector_process.start()
+
+        # 增量数据定时执行
+        scheduler = BackgroundScheduler()
+        # 间隔3秒钟执行一次
+        scheduler.add_job(Schedule.photo2Vector_add, 'interval', seconds=10)
+        # 定时任务12:00执行
+        # scheduler.add_job(Schedule.photo2Vector, 'cron', hour=24, minute=0)
+        # 这里的调度任务是独立的一个线程
+        scheduler.start()
+        # print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
+
+        # print('photo2vector processing running')
+        # photo2vector_process = Process(target=Schedule.photo2Vector)
+        # photo2vector_process.start()
 
         # print('getfacedatas processing running')
         # getfacedatas = Process(target=Schedule.getfacedatas)

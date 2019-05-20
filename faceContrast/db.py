@@ -4,7 +4,7 @@ from faceContrast.settings import *
 import pymysql
 from pymongo import MongoClient
 from bson.binary import Binary
-
+import datetime
 import pickle
 
    
@@ -44,11 +44,25 @@ class MysqlClient(object):
 
     def __init__(self):
         self.pool = PooledDB(pymysql, 5, host=MYSQL_HOST, user=MYSQL_USER_NAME, passwd=str(MYSQL_PASSWORD), db=MYSQL_DB_NAME, port=MYSQL_PORT, setsession=['SET AUTOCOMMIT = 1'])
-    def get(self):
+
+    def get(self,flag: int):
+        """
+        获取数据
+        @param flag:判断数据获取方式 1 全量数据， 0 增量数据
+        """
+        today =datetime.datetime.now().date()
+
         con = self.pool.connection()
         cursor = con.cursor()
-        sql = 'select * from t_face_recognition'
-        cursor.execute(sql)
+        if flag:
+            sql = 'select * from t_face_recognition'
+            args = None
+            print("获取全量数据")
+        else:
+            sql = 'select * from t_face_recognition where DATE(flag) = %s'
+            args = today
+            print("获取增量数据")
+        cursor.execute(sql, args)
         datas = cursor.fetchall()
         cursor.close()
         con.close()
