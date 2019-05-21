@@ -6,6 +6,11 @@ import os
 from faceContrast.settings import * 
 from apscheduler.schedulers.background import BackgroundScheduler
 import logging
+from multiprocessing import Pool
+import multiprocessing
+import time
+from bson.binary import Binary
+import pickle
 
 
 if os.path.exists('log'):
@@ -19,10 +24,10 @@ logging.basicConfig(level=logging.DEBUG,#控制台打印的日志级别
                 filemode='a',##模式，w写模式，a是追加模式，默认如果不写的话，就是追加模式
                 format='%(asctime)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s', #日志格式
                 )
+# 获取本机cpu核数
+PROGRESS_NUMBER = multiprocessing.cpu_count()
 
-
-
-def getData(flag:int):
+def getData(flag:int) -> dict:
     indexAndPath = {}
     indexs = []
     paths = []
@@ -45,45 +50,81 @@ def save2mongo(obj: dict):
     特征数据存储到mongodb
     """
     con = MongoDBClient()
-    con.set(obj)
+    con.insert(obj)
+    print('over')
+
 
 
 
     pass
 
 def save2local(path:str, obj: dict):
+    """特征数据存储到本地"""
     if os.path.exists(path):
         print("该文件已存在")
     else:
         np.savetxt(path, obj['facedata'])
 
 
+def extract_feature(filePath):
+    """获取人像特征数据"""
+    bin_facedata = ''
+    try:
+        r = face_recognition.face_encodings(face_recognition.load_image_file(filePath))[0]
+        bin_facedata = Binary(pickle.dumps(r,protocol=-1),subtype=128)
+    except IndexError:
+        logging.error('there no face in this photo')
+    except FileNotFoundError:
+        logging.error('do have this filePath :' + filePath)
+    except:
+        print('error')
+    return bin_facedata
+
+
+
 def face_2_matrix(datas: dict):
     """
-    将图片转化为矩阵类型，并提取人脸特征值，存储成*.out类型文件
+    将图片转化为矩阵类型，并提取人脸特征值进行存储
     """
+    reduced_datas = []
     for index, filePath in enumerate(datas['path']):
         id_facedata = {}
         path = filePath.split('.')[0]+".out"
         id_facedata['id'] = datas['index'][index]
-        try:
-            obj = face_recognition.face_encodings(face_recognition.load_image_file(filePath))[0]
+        obj = extract_feature(filePath)
+        if obj != '':
             id_facedata['facedata'] = obj
-        except FileNotFoundError:
-            print("No such file or directory: %s" %(filePath))
-            logging.error("id_number:%s, No such file or directory: %s " %(datas['index'][index], filePath))
+        else:
             continue
-        except IndexError:
-            print("don't have face in this photo")
-            logging.error("id_number:%s, don't have face in this photo: %s " %(datas['index'][index], filePath))
-            continue
-        if DATA_SAVE_LOCATION == 1:
-            save2mongo(id_facedata)
-        if DATA_SAVE_LOCATION == 0:
-            save2local(path, id_facedata)
+        reduced_datas.append(id_facedata)
+    if DATA_SAVE_LOCATION == 1:
+        save2mongo(reduced_datas)
+        print("存储成功")
+    if DATA_SAVE_LOCATION == 0:
+        save2local(path, id_facedata)        
+    pass
 
 
-        
+def face_2_matrix_multi(datas: dict):
+    """
+    使用多进程将图片转化为矩阵类型，并提取人脸特征值进行存储
+    """
+    reduced_datas = []
+    pool = Pool(PROGRESS_NUMBER)
+    know_facings = pool.map(extract_feature, datas['path'])
+    pool.close()#关闭进程池，不再接受新的进程
+    pool.join()#主进程阻塞等待子进程的退出
+    print(know_facings)
+    for index, obj in enumerate(know_facings):
+        id_facedata = {}
+        id_facedata['id'] = datas['index'][index]
+        if obj != '':
+            id_facedata['facedata'] = obj
+        else:
+            continue
+        reduced_datas.append(id_facedata)
+    save2mongo(reduced_datas)
+    print("存储成功")
     pass
 
 class Schedule(object):
@@ -94,9 +135,17 @@ class Schedule(object):
         图像转换为矩阵类型
         全量数据更新
         """
-        r = getData(1)
-        face_2_matrix(r)
-        print(r)
+        t1 = time.time()    
+        datas = getData(1)
+        # print(datas)
+        if IF_PROGRESS:
+            print("开启多进程")
+            face_2_matrix_multi(datas)
+        else:
+            face_2_matrix(datas)
+        t2 = time.time()
+        print ("并行执行时间：", int(t2-t1))
+
 
 
     @staticmethod
@@ -130,6 +179,7 @@ class Schedule(object):
         # 全量数据转换
         photo2vector_process = Process(target=Schedule.photo2Vector_all)
         photo2vector_process.start()
+
 
         # 增量数据定时执行
         scheduler = BackgroundScheduler()

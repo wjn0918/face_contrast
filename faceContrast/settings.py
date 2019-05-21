@@ -20,17 +20,13 @@ DM_PASSWORD =  'SYSDBA'
 
 
 
-
-
-# 特征数据存储位置【1：mongodb,0:本地】
-DATA_SAVE_LOCATION = 1
-
 # mongodb配置
-MONGODB_HOST = '10.205.246.34'
+MONGODB_HOST = '192.168.2.221'
 MONGODB_PORT = 27017
 
 
 
-# 使用进程数，提高性能
-PROGRESS_NUMBER = 4
+# 是否启用多进程初始化【1 开启，0 关闭】 多进程未开发成功
+IF_PROGRESS = 1
+
 

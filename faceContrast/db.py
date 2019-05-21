@@ -17,13 +17,14 @@ class MongoDBClient(object):
         self.db = self.con.face_recognition
 
 
-    def set(self,obj: dict):
+    def insert(self,obj: list):
         """
         插入数据
         @param obj：字典类型，k：身份id,v：人像特征数据
         """
         collection = self.db.faces_set
-        collection.insert({'id':obj['id'], 'facedata': Binary(pickle.dumps(obj['facedata'],protocol=-1),subtype=128)})
+        # collection.insert({'id':obj['id'], 'facedata': Binary(pickle.dumps(obj['facedata'],protocol=-1),subtype=128)})
+        collection.insert(obj)
 
     def get(self) -> dict:
         """
