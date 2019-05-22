@@ -4,11 +4,12 @@ from faceContrast.settings import *
 
 from faceContrast.contrast import Contrast
 
+
+
+
 __all__ = ['app']
 
 app = Flask(__name__)
-
-
 
 
 def allowed_file(filename):

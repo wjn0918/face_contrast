@@ -25,6 +25,10 @@ def getfacedatas():
     return id_facedata
 
 
+
+
+
+
 class Contrast():
 
     def __init__(self):
@@ -49,13 +53,17 @@ class Contrast():
 
 
 
-    def __detect_faces_in_image(self, unknown_face_encoding):
+    def __detect_faces_in_image(self, unknown_face_encoding) ->list:
+        """
+        计算图像相似度，返回数组[{'distance':,'id':}]
+        """
         idnumber_distances = []
         known_face_encodings = self.id_facedata['facedata']
         ids = self.id_facedata['id']
         face_distances = face_recognition.face_distance(known_face_encodings, unknown_face_encoding)
         for index, distance in enumerate(face_distances):
-            idnumber_distances.append({'distance': distance,'id': ids[index]})
+            if distance < FACE_DISTANCE:
+                idnumber_distances.append({'distance': distance,'id': ids[index]})
         sorted_results = sorted(idnumber_distances, key=lambda k: k['distance'])
         return sorted_results
         # print(sorted_results)
@@ -63,8 +71,10 @@ class Contrast():
 
 
 
-
     def __contrast(self):
+        """
+        进行人像对比，返回json数据
+        """
         if 'file' not in request.files:
             return redirect(request.url)
 
@@ -78,8 +88,10 @@ class Contrast():
             if isinstance(flag, numpy.ndarray):
                 print("图片中存在人脸")
                 r = self.__detect_faces_in_image(flag)
-                print(r)
-                return r
+                t = {}
+                for num in range(len(r)):
+                    t[num] = r[num]
+                return jsonify(t)
             else:
                 print("图片中没有人脸")
                 return redirect(request.url)

@@ -30,3 +30,7 @@ MONGODB_PORT = 27017
 IF_PROGRESS = 1
 
 
+# 相似度阀值
+FACE_DISTANCE = 0.5
+
+

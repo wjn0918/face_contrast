@@ -6,7 +6,7 @@ def main():
     s = Schedule()
 
     s.run()
-    # app.run(host='',port=5001)
+    app.run(host='',port=5001)
     
 
 

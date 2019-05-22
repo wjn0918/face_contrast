@@ -5,7 +5,6 @@ import face_recognition
 import os
 from faceContrast.settings import * 
 from apscheduler.schedulers.background import BackgroundScheduler
-import logging
 from multiprocessing import Pool
 import multiprocessing
 import time
@@ -13,17 +12,23 @@ from bson.binary import Binary
 import pickle
 
 
-if os.path.exists('log'):
-    pass   
+
+import logging
+
+if os.path.exists('logs'):
+    pass
 else:
-    os.mkdir('log')
+    os.mkdir('logs')
 
-
-logging.basicConfig(level=logging.DEBUG,#控制台打印的日志级别
-                filename='log/run.log',
+logging.basicConfig(
+                level=logging.DEBUG,#控制台打印的日志级别
+                filename='logs/run.log',
                 filemode='a',##模式，w写模式，a是追加模式，默认如果不写的话，就是追加模式
                 format='%(asctime)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s', #日志格式
                 )
+
+
+
 # 获取本机cpu核数
 PROGRESS_NUMBER = multiprocessing.cpu_count()
 
@@ -75,7 +80,7 @@ def extract_feature(filePath):
     except IndexError:
         logging.error('there no face in this photo')
     except FileNotFoundError:
-        logging.error('do have this filePath :' + filePath)
+        logging.error('the file is not exits :' + filePath)
     except:
         print('error')
     return bin_facedata
@@ -114,7 +119,7 @@ def face_2_matrix_multi(datas: dict):
     know_facings = pool.map(extract_feature, datas['path'])
     pool.close()#关闭进程池，不再接受新的进程
     pool.join()#主进程阻塞等待子进程的退出
-    print(know_facings)
+    # print(know_facings)
     for index, obj in enumerate(know_facings):
         id_facedata = {}
         id_facedata['id'] = datas['index'][index]
@@ -124,7 +129,7 @@ def face_2_matrix_multi(datas: dict):
             continue
         reduced_datas.append(id_facedata)
     save2mongo(reduced_datas)
-    print("存储成功")
+    # print("存储成功")
     pass
 
 class Schedule(object):
@@ -139,12 +144,12 @@ class Schedule(object):
         datas = getData(1)
         # print(datas)
         if IF_PROGRESS:
-            print("开启多进程")
+            # print("开启多进程")
             face_2_matrix_multi(datas)
         else:
             face_2_matrix(datas)
-        t2 = time.time()
-        print ("并行执行时间：", int(t2-t1))
+        # t2 = time.time()
+        # print ("并行执行时间：", int(t2-t1))
 
 
 
@@ -156,7 +161,7 @@ class Schedule(object):
         """
         r = getData(0)
         face_2_matrix(r)
-        print(r)
+        # print(r)
 
     
   
@@ -167,7 +172,7 @@ class Schedule(object):
         """
         con = MongoDBClient()
         id_facedata = con.get()
-        print(id_facedata)
+        # print(id_facedata)
 
         
         
@@ -195,9 +200,9 @@ class Schedule(object):
         # photo2vector_process = Process(target=Schedule.photo2Vector)
         # photo2vector_process.start()
 
-        # print('getfacedatas processing running')
-        # getfacedatas = Process(target=Schedule.getfacedatas)
-        # getfacedatas.start()
+        print('getfacedatas processing running')
+        getfacedatas = Process(target=Schedule.getfacedatas)
+        getfacedatas.start()
 
 
 
